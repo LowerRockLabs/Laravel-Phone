@@ -10,6 +10,7 @@ use JsonSerializable;
 use libphonenumber\NumberParseException as libNumberParseException;
 use libphonenumber\PhoneNumberFormat as libPhoneNumberFormat;
 use libphonenumber\PhoneNumberType as libPhoneNumberType;
+use libphonenumber\PhoneNumberToCarrierMapper as libPhoneNumberToCarrierMapper;
 use libphonenumber\PhoneNumberUtil;
 use Propaganistas\LaravelPhone\Aspects\PhoneNumberCountry;
 use Propaganistas\LaravelPhone\Aspects\PhoneNumberFormat;
@@ -34,14 +35,6 @@ class PhoneNumber implements Jsonable, JsonSerializable
         $this->countries = Arr::wrap($country);
     }
     
-    public function getCarrier(): string|null
-    {
-
-        $phoneUtil = PhoneNumberUtil::getInstance()->parse($this->number, $this->getCountry());
-        $carrierMapper = PhoneNumberToCarrierMapper::getInstance();
-        return $carrierMapper->getNameForNumber($phoneUtil, "en");
-    }
-
     public function getCountry(): string|null
     {
         // Try to detect the country first from the number itself.
@@ -265,6 +258,13 @@ class PhoneNumber implements Jsonable, JsonSerializable
 
         // Outputs "Zurich"
         return $geocoder->getDescriptionForNumber($phoneUtil, "en");
+    }
+    
+    public function getCarrier(): string|null
+    {
+        $phoneUtil = PhoneNumberUtil::getInstance()->parse($this->number, $this->getCountry());
+        $carrierMapper = libPhoneNumberToCarrierMapper::getInstance();
+        return $carrierMapper->getNameForNumber($phoneUtil, "en");
     }
 
 }
