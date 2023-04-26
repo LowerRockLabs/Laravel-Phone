@@ -33,6 +33,14 @@ class PhoneNumber implements Jsonable, JsonSerializable
         $this->number = $number;
         $this->countries = Arr::wrap($country);
     }
+    
+    public function getCarrier(): string|null
+    {
+
+        $phoneUtil = PhoneNumberUtil::getInstance()->parse($this->number, $this->getCountry());
+        $carrierMapper = PhoneNumberToCarrierMapper::getInstance();
+        return $carrierMapper->getNameForNumber($phoneUtil, "en");
+    }
 
     public function getCountry(): string|null
     {
